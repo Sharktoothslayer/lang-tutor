@@ -19,6 +19,11 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     preferences = Column(JSON, default={})
     
+    @property
+    def id_str(self):
+        """Convert UUID to string for API serialization"""
+        return str(self.id)
+    
     def verify_password(self, password: str) -> bool:
         return bcrypt.verify(password, self.password_hash)
     

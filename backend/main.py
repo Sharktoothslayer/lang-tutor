@@ -14,7 +14,7 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Add CORS middleware with proper configuration
+# Add CORS middleware with comprehensive configuration
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
@@ -22,10 +22,24 @@ app.add_middleware(
         "http://192.168.0.223:80",    # Nginx port
         "http://localhost:3000",       # Local development
         "http://localhost:80",         # Local nginx
+        "http://192.168.0.223",       # IP without port
+        "http://localhost",            # Local without port
     ],
     allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "HEAD", "PATCH"],
+    allow_headers=[
+        "Accept",
+        "Accept-Language",
+        "Content-Language",
+        "Content-Type",
+        "Authorization",
+        "X-Requested-With",
+        "Origin",
+        "Access-Control-Request-Method",
+        "Access-Control-Request-Headers",
+    ],
+    expose_headers=["*"],
+    max_age=86400,  # Cache preflight for 24 hours
 )
 
 # Include routers
@@ -38,6 +52,11 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "message": "LangTutor API is running"}
+
+@app.options("/{full_path:path}")
+async def options_handler(full_path: str):
+    """Handle OPTIONS requests for CORS preflight"""
+    return {"message": "OK"}
 
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request, exc):

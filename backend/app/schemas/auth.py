@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional
 from datetime import datetime
 
@@ -16,13 +16,14 @@ class UserLogin(BaseModel):
     password: str
 
 class UserResponse(UserBase):
-    id: str  # Changed from int to str for UUID
+    id: str = Field(alias="id")  # This will handle UUID conversion
     is_active: bool
     created_at: datetime
     preferences: dict
     
     class Config:
         from_attributes = True
+        populate_by_name = True
 
 class Token(BaseModel):
     access_token: str
