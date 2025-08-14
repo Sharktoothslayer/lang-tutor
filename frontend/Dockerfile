@@ -9,8 +9,14 @@ COPY package*.json ./
 # Install dependencies with legacy peer deps and clear cache
 RUN npm cache clean --force && npm install --legacy-peer-deps
 
-# Copy source code
-COPY . .
+# Copy source code (explicitly copy src and public directories)
+COPY src/ ./src/
+COPY public/ ./public/
+COPY package*.json ./
+COPY tailwind.config.js ./
+COPY postcss.config.js ./
+COPY tsconfig.json ./
+COPY .browserslistrc ./
 
 # Build the app
 RUN npm run build
