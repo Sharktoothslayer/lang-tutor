@@ -81,16 +81,16 @@ const Conversation: React.FC = () => {
       }
   };
 
-  // ✅ NEW: Real Ollama API call
+  // ✅ FIXED: Use correct Ollama port (11434) and model name
   const callOllamaAPI = async (userInput: string): Promise<string> => {
     try {
-      const response = await fetch('http://192.168.0.223:11435/api/generate', {
+      const response = await fetch('http://192.168.0.223:11434/api/generate', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'mistral',
+          model: 'mistral:latest',  // ✅ Use exact model name from your system
           prompt: `You are an Italian language tutor. The student wrote: "${userInput}". 
                    Respond in Italian, helping them learn. Keep responses conversational and educational. 
                    If they write in English, respond in Italian. If they write in Italian, respond in Italian.`,
