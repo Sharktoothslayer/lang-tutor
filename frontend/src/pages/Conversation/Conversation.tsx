@@ -22,6 +22,7 @@ const Conversation: React.FC = () => {
   ]);
   const [inputText, setInputText] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [aiThinking, setAiThinking] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -56,11 +57,12 @@ const Conversation: React.FC = () => {
       isTyping: true
     };
 
-    setMessages(prev => [...prev, typingMessage]);
+        setMessages(prev => [...prev, typingMessage]);
+    setAiThinking(true);
 
-          try {
-        // ✅ FIXED: Call real Ollama API instead of mock response
-        const aiResponse = await callOllamaAPI(inputText);
+    try {
+      // ✅ FIXED: Call real Ollama API instead of mock response
+      const aiResponse = await callOllamaAPI(inputText);
         
         // Remove typing indicator
         setMessages(prev => prev.filter(msg => msg.id !== 'typing'));
@@ -76,9 +78,10 @@ const Conversation: React.FC = () => {
         setMessages(prev => [...prev, aiMessage]);
       } catch (error) {
         toast.error('Failed to get AI response. Please try again.');
-      } finally {
-        setIsLoading(false);
-      }
+          } finally {
+      setIsLoading(false);
+      setAiThinking(false);
+    }
   };
 
   // ✅ FIXED: Use correct Ollama port (11434) and model name
@@ -91,9 +94,11 @@ const Conversation: React.FC = () => {
         },
         body: JSON.stringify({
           model: 'mistral:latest',  // ✅ Use exact model name from your system
-          prompt: `You are an Italian language tutor. The student wrote: "${userInput}". 
-                   Respond in Italian, helping them learn. Keep responses conversational and educational. 
-                   If they write in English, respond in Italian. If they write in Italian, respond in Italian.`,
+          prompt: `You are a friendly, casual Italian friend helping someone learn Italian. The person wrote: "${userInput}". 
+                   Respond naturally in Italian like a real person would - be conversational, use casual language, 
+                   make jokes, ask follow-up questions, and keep it fun and engaging. Don't sound like a textbook or AI. 
+                   If they write in English, respond in Italian. If they write in Italian, respond in Italian. 
+                   Keep responses shorter (2-4 sentences max) and more natural.`,
           stream: false
         })
       });
@@ -226,7 +231,14 @@ const Conversation: React.FC = () => {
         </div>
         
         <div className="mt-2 text-xs text-gray-500 text-center">
-          💡 Tip: Try asking "Come stai?" (How are you?) or "Cosa ti piace fare?" (What do you like to do?)
+          {aiThinking ? (
+            <div className="flex items-center justify-center space-x-2">
+              <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+              <span>🤖 AI is thinking... This may take 10-30 seconds for the first response</span>
+            </div>
+          ) : (
+            "💡 Tip: Try asking \"Come stai?\" (How are you?) or \"Cosa ti piace fare?\" (What do you like to do?)"
+          )}
         </div>
       </div>
     </div>
