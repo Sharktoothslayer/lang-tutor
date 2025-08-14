@@ -13,7 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { useAuth } from '../../contexts/AuthContext';
-import { api } from '../../config/api';
+import api from '../../config/api';
 import toast from 'react-hot-toast';
 
 interface LearningStats {

@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpenIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from 'react-icons/hi';
+import { BookOpenIcon, ClockIcon, CheckCircleIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import { useAuth } from '../../contexts/AuthContext';
-import { api } from '../../config/api';
+import api from '../../config/api';
 
 interface VocabularyWord {
   progress_id?: string;
@@ -163,10 +163,10 @@ const Vocabulary: React.FC = () => {
         <div className="text-center mb-6">
           <h2 className="text-4xl font-bold text-gray-900 mb-2">{currentWord.word}</h2>
           <p className="text-lg text-gray-600 mb-4">Pronunciation: {currentWord.pronunciation}</p>
-          <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-            <BookOpenIcon className="w-4 h-4 mr-2" />
-            {currentWord.difficulty}
-          </div>
+                     <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+             <BookOpenIcon className="w-4 h-4 mr-2" />
+             {currentWord.difficulty || 'beginner'}
+           </div>
         </div>
 
         {!showAnswer ? (
@@ -197,7 +197,7 @@ const Vocabulary: React.FC = () => {
                 onClick={() => handleResponse(1)}
                 className="flex flex-col items-center p-3 rounded-lg border-2 border-red-200 hover:border-red-300 hover:bg-red-50 transition-colors"
               >
-                <XCircleIcon className="w-6 h-6 text-red-500 mb-1" />
+                                 <XMarkIcon className="w-6 h-6 text-red-500 mb-1" />
                 <span className="text-xs text-red-600">Again</span>
               </button>
               <button
