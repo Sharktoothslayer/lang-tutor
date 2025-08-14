@@ -1,80 +1,45 @@
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.security import HTTPBearer
-from contextlib import asynccontextmanager
+from fastapi.responses import JSONResponse
+from app.core.database import engine, Base
+from app.routers import auth
 import uvicorn
-import logging
 
-from app.core.config import settings
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
-
-# Security
-security = HTTPBearer()
-
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    # Startup
-    logger.info("Starting up Language Tutor API...")
-    
-    # Initialize services here
-    logger.info("Language Tutor API started successfully")
-    
-    yield
-    
-    # Shutdown
-    logger.info("Shutting down Language Tutor API...")
-
-# Create FastAPI app
 app = FastAPI(
-    title="Language Tutor API",
+    title="LangTutor API",
     description="AI-powered language learning platform with spaced repetition",
-    version="1.0.0",
-    lifespan=lifespan
+    version="1.0.0"
 )
 
 # Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.ALLOWED_HOSTS,
+    allow_origins=["*"],  # In production, restrict this to your frontend domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Health check endpoint
-@app.get("/health")
-async def health_check():
-    return {
-        "status": "healthy",
-        "service": "Language Tutor API",
-        "version": "1.0.0"
-    }
+# Include routers
+app.include_router(auth.router, prefix="/api/v1")
 
-# Root endpoint
 @app.get("/")
 async def root():
-    return {
-        "message": "Welcome to Language Tutor API",
-        "docs": "/docs",
-        "health": "/health"
-    }
+    return {"message": "Welcome to LangTutor API! 🇮🇹"}
 
-# Protected endpoint example
-@app.get("/protected")
-async def protected_route():
-    return {
-        "message": "This is a protected route",
-        "note": "Authentication not yet implemented"
-    }
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "message": "LangTutor API is running"}
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request, exc):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail}
+    )
 
 if __name__ == "__main__":
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=settings.DEBUG,
-        log_level="info"
-    ) 
+    uvicorn.run(app, host="0.0.0.0", port=8000) 
