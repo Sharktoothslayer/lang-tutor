@@ -86,9 +86,9 @@ class SpacedRepetitionService:
                 UserVocabularyProgress.user_id == user_id
             )
             
-                   query = select(Vocabulary).where(
-                       Vocabulary.language_code == 'it'  # Default to Italian, make configurable
-                   ).where(
+            query = select(Vocabulary).where(
+                Vocabulary.language_code == 'it'  # Default to Italian, make configurable
+            ).where(
                 ~Vocabulary.id.in_(subquery)
             ).order_by(Vocabulary.difficulty_level.asc(), Vocabulary.frequency_rank.asc())
             
