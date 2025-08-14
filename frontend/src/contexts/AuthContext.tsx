@@ -75,9 +75,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       setError(null);
       
-      const response = await api.post('/api/v1/auth/login', {
-        username: email,  // ✅ FIXED: Changed from 'email' to 'username'
-        password,
+      // ✅ FIXED: Send form data instead of JSON
+      const formData = new URLSearchParams();
+      formData.append('username', email);
+      formData.append('password', password);
+      
+      const response = await api.post('/api/v1/auth/login', formData, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       });
 
       const { access_token, user: userData } = response.data;
