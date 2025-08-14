@@ -5,7 +5,7 @@ import {
   ClockIcon, 
   StarIcon, 
   TrophyIcon,
-  TrendingUpIcon,
+  ChartBarIcon,
   CalendarIcon
 } from '@heroicons/react/24/outline';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
@@ -86,7 +86,7 @@ const Progress: React.FC = () => {
         >
           <div className="flex items-center">
             <div className="p-3 bg-purple-100 rounded-lg">
-              <TrendingUpIcon className="w-6 h-6 text-purple-600" />
+              <ChartBarIcon className="w-6 h-6 text-purple-600" />
             </div>
             <div className="ml-4">
               <p className="text-sm font-medium text-gray-600">Accuracy</p>
