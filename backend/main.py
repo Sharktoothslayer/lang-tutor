@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from app.core.database import engine, Base, get_db
 from app.routers import auth
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from fastapi import Depends
 import uvicorn
 
@@ -60,25 +61,33 @@ async def debug_database(db: Session = Depends(get_db)):
     """Debug endpoint to test database connectivity"""
     try:
         # Test basic database connection
-        result = db.execute("SELECT 1 as test")
+        result = db.execute(text("SELECT 1 as test"))
         test_value = result.scalar()
         
         # Test if users table exists
-        result = db.execute("SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'users'")
+        result = db.execute(text("SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'users'"))
         users_table_exists = result.scalar() > 0
         
         # Test users table structure
         users_info = {}
         if users_table_exists:
-            result = db.execute("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'users' ORDER BY ordinal_position")
+            result = db.execute(text("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'users' ORDER BY ordinal_position"))
             columns = result.fetchall()
             users_info = {col[0]: col[1] for col in columns}
+        
+        # Check existing users
+        existing_users = []
+        if users_table_exists:
+            result = db.execute(text("SELECT username, email, created_at FROM users LIMIT 5"))
+            users = result.fetchall()
+            existing_users = [{"username": u[0], "email": u[1], "created_at": str(u[2])} for u in users]
         
         return {
             "database_connection": "OK",
             "test_query": test_value,
             "users_table_exists": users_table_exists,
-            "users_table_structure": users_info
+            "users_table_structure": users_info,
+            "existing_users": existing_users
         }
     except Exception as e:
         return {
