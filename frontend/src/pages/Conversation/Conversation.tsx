@@ -58,27 +58,55 @@ const Conversation: React.FC = () => {
 
     setMessages(prev => [...prev, typingMessage]);
 
-    try {
-      // Simulate AI response (replace with actual API call)
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      // Remove typing indicator
-      setMessages(prev => prev.filter(msg => msg.id !== 'typing'));
-      
-      // Add AI response
-      const aiResponse = generateAIResponse(inputText);
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        text: aiResponse,
-        sender: 'ai',
-        timestamp: new Date()
-      };
+          try {
+        // ✅ FIXED: Call real Ollama API instead of mock response
+        const aiResponse = await callOllamaAPI(inputText);
+        
+        // Remove typing indicator
+        setMessages(prev => prev.filter(msg => msg.id !== 'typing'));
+        
+        // Add real AI response
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          text: aiResponse,
+          sender: 'ai',
+          timestamp: new Date()
+        };
 
-      setMessages(prev => [...prev, aiMessage]);
+        setMessages(prev => [...prev, aiMessage]);
+      } catch (error) {
+        toast.error('Failed to get AI response. Please try again.');
+      } finally {
+        setIsLoading(false);
+      }
+  };
+
+  // ✅ NEW: Real Ollama API call
+  const callOllamaAPI = async (userInput: string): Promise<string> => {
+    try {
+      const response = await fetch('http://192.168.0.223:11435/api/generate', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'mistral',
+          prompt: `You are an Italian language tutor. The student wrote: "${userInput}". 
+                   Respond in Italian, helping them learn. Keep responses conversational and educational. 
+                   If they write in English, respond in Italian. If they write in Italian, respond in Italian.`,
+          stream: false
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Ollama API request failed');
+      }
+
+      const data = await response.json();
+      return data.response || 'Mi dispiace, non ho capito. Puoi ripetere?';
     } catch (error) {
-      toast.error('Failed to get AI response. Please try again.');
-    } finally {
-      setIsLoading(false);
+      console.error('Ollama API error:', error);
+      return 'Mi dispiace, c\'è stato un problema con l\'AI. Riprova più tardi.';
     }
   };
 
