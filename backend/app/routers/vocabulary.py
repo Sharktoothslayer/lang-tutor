@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import Session
 from typing import List, Dict, Any
 from app.dependencies.auth import get_current_user
 from app.models.user import User
@@ -11,15 +11,15 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/api/v1/vocabulary", tags=["vocabulary"])
 
 @router.get("/review-words")
-async def get_review_words(
+def get_review_words(
     session_size: int = 20,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ) -> List[Dict[str, Any]]:
     """Get words due for review using spaced repetition algorithm."""
     try:
         service = SpacedRepetitionService()
-        words = await service.get_words_for_review(
+        words = service.get_words_for_review(
             user_id=str(current_user.id),
             session_size=session_size,
             db=db
@@ -33,12 +33,12 @@ async def get_review_words(
         )
 
 @router.post("/review-response")
-async def submit_review_response(
+def submit_review_response(
     vocabulary_id: str,
     quality: int,
     response_time_ms: int = None,
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """Submit a review response and get next review interval."""
     if not 0 <= quality <= 5:
@@ -49,7 +49,7 @@ async def submit_review_response(
     
     try:
         service = SpacedRepetitionService()
-        result = await service.process_review_response(
+        result = service.process_review_response(
             user_id=str(current_user.id),
             vocabulary_id=vocabulary_id,
             quality=quality,
@@ -65,14 +65,14 @@ async def submit_review_response(
         )
 
 @router.get("/statistics")
-async def get_learning_statistics(
+def get_learning_statistics(
     current_user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db)
+    db: Session = Depends(get_db)
 ) -> Dict[str, Any]:
     """Get comprehensive learning statistics for the current user."""
     try:
         service = SpacedRepetitionService()
-        stats = await service.get_learning_statistics(
+        stats = service.get_learning_statistics(
             user_id=str(current_user.id),
             db=db
         )

@@ -1,6 +1,7 @@
 from sqlalchemy import Column, String, DateTime, Boolean, JSON, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.sql import func
+from sqlalchemy.orm import relationship
 from passlib.hash import bcrypt
 from app.core.database import Base
 import uuid
@@ -18,6 +19,9 @@ class User(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     is_active = Column(Boolean, default=True)
     preferences = Column(JSON, default={})
+    
+    # Relationships
+    vocabulary_progress = relationship("UserVocabularyProgress", back_populates="user")
     
     def to_dict(self):
         """Convert user to dictionary with string ID for API responses"""
