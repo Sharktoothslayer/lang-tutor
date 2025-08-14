@@ -94,10 +94,10 @@ const Conversation: React.FC = () => {
         },
         body: JSON.stringify({
           model: 'mistral:latest',  // ✅ Use exact model name from your system
-          prompt: `You are a casual Italian friend chatting naturally. The person wrote: "${userInput}". 
-                   Respond like a real person in a casual conversation - use everyday Italian, be brief and natural. 
-                   Keep responses SHORT (1-2 sentences max) and conversational. No formal language, no long explanations. 
-                   Just chat naturally like friends do. If they write in English, respond in Italian.`,
+          prompt: `You are an Italian language teacher helping a student practice. The student wrote: "${userInput}". 
+                   Respond in simple, clear Italian to help them learn. Keep responses SHORT (1-2 ssentences max). 
+                   Use basic vocabulary and grammar they can understand. Don't pretend to know them personally. 
+                   If they write in English, respond in Italian. Be encouraging but natural.`,
           stream: false
         })
       });

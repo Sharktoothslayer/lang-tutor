@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from app.core.database import engine, Base, get_db
-from app.routers import auth
+from app.routers import auth, vocabulary
 from sqlalchemy.orm import Session
 from sqlalchemy import text
 from fastapi import Depends
@@ -47,6 +47,7 @@ app.add_middleware(
 
 # Include routers
 app.include_router(auth.router, prefix="/api/v1")
+app.include_router(vocabulary.router, prefix="/api/v1")
 
 @app.get("/")
 async def root():

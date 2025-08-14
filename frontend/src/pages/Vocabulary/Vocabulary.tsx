@@ -1,119 +1,130 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { BookOpenIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, ClockIcon, CheckCircleIcon, XCircleIcon } from 'react-icons/hi';
 import toast from 'react-hot-toast';
+import { useAuth } from '../../contexts/AuthContext';
+import { api } from '../../config/api';
 
 interface VocabularyWord {
-  id: number;
+  progress_id?: string;
+  word_id: string;
   word: string;
   translation: string;
   part_of_speech: string;
-  difficulty: string;
+  difficulty?: string;
   example_sentence: string;
   pronunciation: string;
-  next_review: string;
+  next_review?: string;
   interval: number;
   ease_factor: number;
+  repetitions: number;
+  mastery_level: number;
 }
 
 const Vocabulary: React.FC = () => {
+  const { user } = useAuth();
   const [words, setWords] = useState<VocabularyWord[]>([]);
   const [currentWordIndex, setCurrentWordIndex] = useState(0);
   const [showAnswer, setShowAnswer] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Mock data for demonstration
+  // Fetch real vocabulary data from API
   useEffect(() => {
-    const mockWords: VocabularyWord[] = [
-      {
-        id: 1,
-        word: 'ciao',
-        translation: 'hello/hi',
-        part_of_speech: 'interjection',
-        difficulty: 'beginner',
-        example_sentence: 'Ciao! Come stai?',
-        pronunciation: 'chow',
-        next_review: '2024-01-15',
-        interval: 1,
-        ease_factor: 2.5
-      },
-      {
-        id: 2,
-        word: 'grazie',
-        translation: 'thank you',
-        part_of_speech: 'interjection',
-        difficulty: 'beginner',
-        example_sentence: 'Grazie mille per l\'aiuto!',
-        pronunciation: 'grah-tsee-eh',
-        next_review: '2024-01-16',
-        interval: 1,
-        ease_factor: 2.5
-      },
-      {
-        id: 3,
-        word: 'acqua',
-        translation: 'water',
-        part_of_speech: 'noun',
-        difficulty: 'beginner',
-        example_sentence: 'Vorrei un bicchiere d\'acqua.',
-        pronunciation: 'ah-kwah',
-        next_review: '2024-01-17',
-        interval: 1,
-        ease_factor: 2.5
+    const fetchVocabularyWords = async () => {
+      if (!user) return;
+      
+      try {
+        setIsLoading(true);
+        const response = await api.get('/api/v1/vocabulary/review-words?session_size=20');
+        setWords(response.data);
+      } catch (error) {
+        console.error('Error fetching vocabulary words:', error);
+        toast.error('Failed to load vocabulary words');
+      } finally {
+        setIsLoading(false);
       }
-    ];
-    
-    setWords(mockWords);
-    setIsLoading(false);
-  }, []);
+    };
+
+    fetchVocabularyWords();
+  }, [user]);
 
   const handleShowAnswer = () => {
     setShowAnswer(true);
   };
 
-  const handleResponse = (quality: number) => {
+  const handleResponse = async (quality: number) => {
     const currentWord = words[currentWordIndex];
     
-    // Simulate spaced repetition algorithm
-    let newInterval: number;
-    let newEaseFactor: number;
-    
-    if (quality >= 3) {
-      // Good response
-      newInterval = currentWord.interval * 2;
-      newEaseFactor = Math.max(1.3, currentWord.ease_factor + 0.1);
-      toast.success(`Great job! You'll see "${currentWord.word}" again in ${newInterval} days.`);
-    } else {
-      // Poor response
-      newInterval = 1;
-      newEaseFactor = Math.max(1.3, currentWord.ease_factor - 0.2);
-      toast.error(`Keep practicing! You'll see "${currentWord.word}" again tomorrow.`);
-    }
+    try {
+      // Submit response to API
+      const response = await api.post('/api/v1/vocabulary/review-response', {
+        vocabulary_id: currentWord.word_id,
+        quality: quality,
+        response_time_ms: Date.now()
+      });
+      
+      const result = response.data;
+      
+      // Show success message based on quality
+      if (quality >= 3) {
+        toast.success(`Great job! You'll see "${currentWord.word}" again in ${result.new_interval} days.`);
+      } else {
+        toast.error(`Keep practicing! You'll see "${currentWord.word}" again tomorrow.`);
+      }
 
-    // Update word data
-    const updatedWords = words.map((word, index) => 
-      index === currentWordIndex 
-        ? { ...word, interval: newInterval, ease_factor: newEaseFactor }
-        : word
-    );
-    
-    setWords(updatedWords);
-    
-    // Move to next word or reset
-    if (currentWordIndex < words.length - 1) {
-      setCurrentWordIndex(currentWordIndex + 1);
-    } else {
-      setCurrentWordIndex(0);
-      toast.success('Session complete! Great work! 🎉');
+      // Update word data with new values from API
+      const updatedWords = words.map((word, index) => 
+        index === currentWordIndex 
+          ? { 
+              ...word, 
+              interval: result.new_interval, 
+              ease_factor: result.new_ease_factor,
+              next_review: result.next_review
+            }
+          : word
+      );
+      
+      setWords(updatedWords);
+      
+      // Move to next word or reset
+      if (currentWordIndex < words.length - 1) {
+        setCurrentWordIndex(currentWordIndex + 1);
+      } else {
+        setCurrentWordIndex(0);
+        toast.success('Session complete! Great work! 🎉');
+      }
+      
+      setShowAnswer(false);
+      
+    } catch (error) {
+      console.error('Error submitting review response:', error);
+      toast.error('Failed to submit response. Please try again.');
     }
-    
-    setShowAnswer(false);
   };
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
+  if (words.length === 0) {
+    return (
+      <div className="max-w-4xl mx-auto p-6">
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Vocabulary Practice 🇮🇹</h1>
+          <p className="text-gray-600">Learn and review Italian words with spaced repetition</p>
+        </div>
+        <div className="bg-white rounded-lg shadow-lg p-8 text-center">
+          <BookOpenIcon className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No Words Available</h3>
+          <p className="text-gray-600 mb-4">
+            It looks like there are no vocabulary words available yet. 
+            Please check back later or contact your administrator.
+          </p>
+        </div>
       </div>
     );
   }
@@ -230,7 +241,10 @@ const Vocabulary: React.FC = () => {
             <div>
               <p className="text-sm font-medium text-gray-600">Next Review</p>
               <p className="text-lg font-semibold text-gray-900">
-                {new Date(currentWord.next_review).toLocaleDateString()}
+                {currentWord.next_review 
+                  ? new Date(currentWord.next_review).toLocaleDateString()
+                  : 'Today'
+                }
               </p>
             </div>
           </div>
@@ -250,9 +264,9 @@ const Vocabulary: React.FC = () => {
           <div className="flex items-center">
             <CheckCircleIcon className="w-8 h-8 text-purple-500 mr-3" />
             <div>
-              <p className="text-sm font-medium text-gray-600">Ease Factor</p>
+              <p className="text-sm font-medium text-gray-600">Mastery Level</p>
               <p className="text-lg font-semibold text-gray-900">
-                {currentWord.ease_factor.toFixed(1)}
+                {currentWord.mastery_level}/5
               </p>
             </div>
           </div>
