@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import axios from 'axios';
+import api from '../config/api';
 
 interface User {
   id: string;
@@ -57,17 +57,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setIsLoading(false);
         return;
       }
-
-      // Set default auth header
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
-      const response = await axios.get('/api/v1/auth/me');
+      const response = await api.get('/api/v1/auth/me');
       setUser(response.data);
       setError(null);
     } catch (err) {
       console.error('Auth check failed:', err);
       localStorage.removeItem('token');
-      delete axios.defaults.headers.common['Authorization'];
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -79,7 +75,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       setError(null);
       
-      const response = await axios.post('/api/v1/auth/login', {
+      const response = await api.post('/api/v1/auth/login', {
         email,
         password,
       });
@@ -88,7 +84,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Store token
       localStorage.setItem('token', access_token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       
       setUser(userData);
       setError(null);
@@ -112,7 +107,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(true);
       setError(null);
       
-      const response = await axios.post('/api/v1/auth/register', {
+      const response = await api.post('/api/v1/auth/register', {
         username,
         email,
         password,
@@ -124,7 +119,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Store token
       localStorage.setItem('token', access_token);
-      axios.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
       
       setUser(userData);
       setError(null);
@@ -139,7 +133,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
-    delete axios.defaults.headers.common['Authorization'];
     setUser(null);
     setError(null);
   };
