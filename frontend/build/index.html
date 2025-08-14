@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lang-Tutor - Italian Language Learning</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .text-gradient { background: linear-gradient(45deg, #3B82F6, #8B5CF6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <div class="min-h-screen">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b border-gray-200">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center py-6">
+                    <div class="flex items-center">
+                        <h1 class="text-3xl font-bold text-gradient">🇮🇹 LangTutor</h1>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <span class="text-gray-600">Italian Language Learning</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+            <!-- Welcome Section -->
+            <div class="text-center mb-12">
+                <h2 class="text-4xl font-bold text-gray-900 mb-4">
+                    Welcome to Lang-Tutor! 🚀
+                </h2>
+                <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+                    Your AI-powered Italian language learning platform with spaced repetition is now running successfully!
+                </p>
+            </div>
+
+            <!-- Status Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-green-100 rounded-lg">
+                            <span class="text-2xl">✅</span>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Frontend</h3>
+                            <p class="text-gray-600">Running on port 3000</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-blue-100 rounded-lg">
+                            <span class="text-2xl">🔧</span>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Backend API</h3>
+                            <p class="text-gray-600">Running on port 8000</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                    <div class="flex items-center">
+                        <div class="p-3 bg-purple-100 rounded-lg">
+                            <span class="text-2xl">🤖</span>
+                        </div>
+                        <div class="ml-4">
+                            <h3 class="text-lg font-semibold text-gray-900">AI Service</h3>
+                            <p class="text-gray-600">Ollama on port 11435</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">Quick Actions</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="text-center">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">API Documentation</h4>
+                        <p class="text-gray-600 mb-4">Explore the backend API endpoints</p>
+                        <a href="http://localhost:8000/docs" target="_blank" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                            View API Docs
+                        </a>
+                    </div>
+                    <div class="text-center">
+                        <h4 class="text-lg font-semibold text-gray-900 mb-2">Health Check</h4>
+                        <p class="text-gray-600 mb-4">Verify all services are running</p>
+                        <a href="http://localhost:8000/health" target="_blank" class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                            Check Health
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Next Steps -->
+            <div class="mt-12 bg-blue-50 rounded-lg p-6">
+                <h3 class="text-lg font-semibold text-blue-900 mb-4">🎯 Next Steps</h3>
+                <ol class="list-decimal list-inside space-y-2 text-blue-800">
+                    <li>Build the full React frontend on your Unraid server</li>
+                    <li>Load Italian vocabulary into the database</li>
+                    <li>Start your Italian language learning journey!</li>
+                </ol>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200 mt-12">
+            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+                <p class="text-center text-gray-500">
+                    Lang-Tutor - AI-Powered Italian Language Learning Platform
+                </p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

@@ -6,10 +6,6 @@ import uvicorn
 import logging
 
 from app.core.config import settings
-from app.core.database import engine, Base
-from app.api.v1.api import api_router
-from app.core.security import get_current_user
-from app.services.ollama_service import OllamaService
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -23,17 +19,8 @@ async def lifespan(app: FastAPI):
     # Startup
     logger.info("Starting up Language Tutor API...")
     
-    # Create database tables
-    async with engine.begin() as conn:
-        await conn.run_sync(Base.metadata.create_all)
-    
-    # Initialize Ollama service
-    try:
-        ollama_service = OllamaService()
-        await ollama_service.initialize()
-        logger.info("Ollama service initialized successfully")
-    except Exception as e:
-        logger.error(f"Failed to initialize Ollama service: {e}")
+    # Initialize services here
+    logger.info("Language Tutor API started successfully")
     
     yield
     
@@ -57,9 +44,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API routes
-app.include_router(api_router, prefix="/api/v1")
-
 # Health check endpoint
 @app.get("/health")
 async def health_check():
@@ -80,11 +64,10 @@ async def root():
 
 # Protected endpoint example
 @app.get("/protected")
-async def protected_route(current_user = Depends(get_current_user)):
+async def protected_route():
     return {
         "message": "This is a protected route",
-        "user_id": current_user.id,
-        "username": current_user.username
+        "note": "Authentication not yet implemented"
     }
 
 if __name__ == "__main__":
