@@ -76,7 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setError(null);
       
       const response = await api.post('/api/v1/auth/login', {
-        email,
+        username: email,  // ✅ FIXED: Changed from 'email' to 'username'
         password,
       });
 
