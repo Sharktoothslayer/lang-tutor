@@ -54,7 +54,7 @@ async def register(user: UserCreate, db: Session = Depends(get_db)):
         return {
             "access_token": access_token,
             "token_type": "bearer",
-            "user": created_user
+            "user": created_user.to_dict()  # Use to_dict method
         }
         
     except HTTPException:
@@ -97,7 +97,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
         return {
             "access_token": access_token,
             "token_type": "bearer",
-            "user": user
+            "user": user.to_dict()  # Use to_dict method
         }
         
     except HTTPException:
@@ -118,4 +118,4 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
 
 @router.get("/me", response_model=UserResponse)
 async def get_current_user_info(current_user: User = Depends(get_current_active_user)):
-    return current_user
+    return current_user.to_dict()  # Use to_dict method

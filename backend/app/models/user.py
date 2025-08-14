@@ -19,10 +19,19 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     preferences = Column(JSON, default={})
     
-    @property
-    def id_str(self):
-        """Convert UUID to string for API serialization"""
-        return str(self.id)
+    def to_dict(self):
+        """Convert user to dictionary with string ID for API responses"""
+        return {
+            "id": str(self.id),
+            "username": self.username,
+            "email": self.email,
+            "native_language": self.native_language,
+            "target_language": self.target_language,
+            "created_at": self.created_at,
+            "updated_at": self.updated_at,
+            "is_active": self.is_active,
+            "preferences": self.preferences
+        }
     
     def verify_password(self, password: str) -> bool:
         return bcrypt.verify(password, self.password_hash)
