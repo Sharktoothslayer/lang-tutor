@@ -1,8 +1,10 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from app.core.database import engine, Base
+from app.core.database import engine, Base, get_db
 from app.routers import auth
+from sqlalchemy.orm import Session
+from fastapi import Depends
 import uvicorn
 
 # Create database tables
@@ -52,6 +54,38 @@ async def root():
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "message": "LangTutor API is running"}
+
+@app.get("/debug/db")
+async def debug_database(db: Session = Depends(get_db)):
+    """Debug endpoint to test database connectivity"""
+    try:
+        # Test basic database connection
+        result = db.execute("SELECT 1 as test")
+        test_value = result.scalar()
+        
+        # Test if users table exists
+        result = db.execute("SELECT COUNT(*) FROM information_schema.tables WHERE table_name = 'users'")
+        users_table_exists = result.scalar() > 0
+        
+        # Test users table structure
+        users_info = {}
+        if users_table_exists:
+            result = db.execute("SELECT column_name, data_type FROM information_schema.columns WHERE table_name = 'users' ORDER BY ordinal_position")
+            columns = result.fetchall()
+            users_info = {col[0]: col[1] for col in columns}
+        
+        return {
+            "database_connection": "OK",
+            "test_query": test_value,
+            "users_table_exists": users_table_exists,
+            "users_table_structure": users_info
+        }
+    except Exception as e:
+        return {
+            "database_connection": "FAILED",
+            "error": str(e),
+            "error_type": type(e).__name__
+        }
 
 @app.options("/{full_path:path}")
 async def options_handler(full_path: str):
