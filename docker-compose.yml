@@ -35,12 +35,13 @@ services:
     image: ollama/ollama:latest
     container_name: lang-tutor-ollama
     ports:
-      - "11435:11434"  # Changed port to avoid conflicts
+      - "11434:11434"  # ✅ FIXED: Use standard Ollama port
     volumes:
       - ollama_data:/root/.ollama
     restart: unless-stopped
     environment:
-      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_HOST=0.0.0.0:11434
+      - OLLAMA_ORIGINS=http://192.168.0.223:3000,http://localhost:3000,http://192.168.0.223:80,http://localhost:80
       - OLLAMA_MODEL=mistral:7b
       - OLLAMA_NUM_PARALLEL=3
       - OLLAMA_CPU_THREADS=4
