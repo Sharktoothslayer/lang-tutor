@@ -1,12 +1,7 @@
 #!/bin/bash
 
-# Lang-Tutor Quick Start Script for Unraid
-# This script will help you get the system running quickly
-
-set -e
-
-echo "🚀 Lang-Tutor Quick Start Script"
-echo "=================================="
+echo "🚀 Lang-Tutor Quick Start Script for Unraid"
+echo "============================================="
 
 # Check if Docker is running
 if ! docker info > /dev/null 2>&1; then
@@ -29,21 +24,19 @@ if [ ! -f .env ]; then
     echo "📝 Creating .env file from template..."
     cp env.example .env
     
-    # Generate a random secret key
-    SECRET_KEY=$(openssl rand -hex 32)
-    sed -i "s/your-secret-key-here-change-this-in-production/$SECRET_KEY/" .env
-    
-    # Generate a random database password
-    DB_PASSWORD=$(openssl rand -base64 16)
-    sed -i "s/langtutor123/$DB_PASSWORD/" .env
-    
-    echo "✅ Created .env file with secure credentials"
-    echo "📋 Database password: $DB_PASSWORD"
-    echo "📋 Secret key: $SECRET_KEY"
-    echo "⚠️  Please save these credentials securely!"
+    echo "✅ Created .env file"
+    echo "⚠️  Please edit .env file and set secure passwords before continuing"
+    echo ""
+    read -p "Press Enter to continue..."
 else
     echo "✅ .env file already exists"
 fi
+
+# Create persistent storage directories
+echo "📁 Creating persistent storage directories..."
+mkdir -p /mnt/user/appdata/lang-tutor/postgres
+mkdir -p /mnt/user/appdata/lang-tutor/redis
+mkdir -p /mnt/user/appdata/lang-tutor/ollama
 
 # Pull the latest images
 echo "📥 Pulling Docker images..."
@@ -58,9 +51,7 @@ sleep 10
 
 # Download the AI model
 echo "📚 Downloading AI model (this may take a while)..."
-docker exec -it lang-tutor-ollama ollama pull mistral:7b || {
-    echo "⚠️  Failed to download model. You can try manually later."
-}
+docker exec -it lang-tutor-ollama ollama pull mistral:7b
 
 # Start all services
 echo "🚀 Starting all services..."
@@ -77,14 +68,19 @@ echo ""
 echo "🎉 Setup complete! Your Lang-Tutor system is now running."
 echo ""
 echo "🌐 Access your application at:"
-echo "   Frontend: http://$(hostname -I | awk '{print $1}'):3000"
-echo "   Backend API: http://$(hostname -I | awk '{print $1}'):8000"
-echo "   API Docs: http://$(hostname -I | awk '{print $1}'):8000/docs"
+echo "   Frontend: http://localhost:3000"
+echo "   Backend API: http://localhost:8000"
+echo "   API Docs: http://localhost:8000/docs"
+echo ""
+echo "🇮🇹 Italian Language Learning Setup:"
+echo "   - Target language set to Italian"
+echo "   - AI tutor will converse in Italian"
+echo "   - Vocabulary focused on Italian words"
 echo ""
 echo "📚 Next steps:"
 echo "   1. Open the frontend in your browser"
 echo "   2. Register a new account"
-echo "   3. Start learning!"
+echo "   3. Start learning Italian!"
 echo ""
 echo "🔧 Useful commands:"
 echo "   View logs: docker-compose logs -f"
