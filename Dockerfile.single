@@ -6,6 +6,10 @@ ENV DEBIAN_FRONTEND=noninteractive
 ENV PYTHONUNBUFFERED=1
 ENV OLLAMA_HOST=0.0.0.0
 
+# Add PostgreSQL repository
+RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+    && echo "deb http://apt.postgresql.org/pub/repos/apt/ jammy-pgdg main" > /etc/apt/sources.list.d/pgdg.list
+
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     curl \
