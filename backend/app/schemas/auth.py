@@ -16,7 +16,7 @@ class UserLogin(BaseModel):
     password: str
 
 class UserResponse(UserBase):
-    id: int
+    id: str  # Changed from int to str for UUID
     is_active: bool
     created_at: datetime
     preferences: dict
