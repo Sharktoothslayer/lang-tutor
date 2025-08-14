@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  lang-tutor:
+    build:
+      context: .
+      dockerfile: Dockerfile.single
+    container_name: lang-tutor-all-in-one
+    ports:
+      - "3000:80"  # Frontend
+      - "8000:8000"  # Backend API
+      - "5432:5432"  # PostgreSQL
+      - "6379:6379"  # Redis
+      - "11435:11434"  # Ollama
+    environment:
+      - POSTGRES_DB=langtutor
+      - POSTGRES_USER=langtutor
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-langtutor123}
+      - SECRET_KEY=${SECRET_KEY:-your-secret-key-here}
+      - ENVIRONMENT=production
+      - OLLAMA_HOST=0.0.0.0
+      - OLLAMA_MODEL=mistral:7b
+      - OLLAMA_NUM_PARALLEL=3
+      - OLLAMA_CPU_THREADS=4
+      - OLLAMA_MAX_TOKENS=2048
+    volumes:
+      - ./data:/app/data
+      - ./frontend/build:/app/frontend
+      - ./backend:/app/backend
+    restart: unless-stopped
+    deploy:
+      resources:
+        limits:
+          memory: 8G
+          cpus: '4.0'
+        reservations:
+          memory: 4G
+          cpus: '2.0'
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: /mnt/user/appdata/lang-tutor/data
