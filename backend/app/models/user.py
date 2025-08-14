@@ -9,7 +9,7 @@ class User(Base):
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, index=True, nullable=False)
     email = Column(String(100), unique=True, index=True, nullable=False)
-    hashed_password = Column(String(255), nullable=False)
+    password_hash = Column(String(255), nullable=False)  # Changed from hashed_password
     native_language = Column(String(10), default="en")
     target_language = Column(String(10), default="it")
     is_active = Column(Boolean, default=True)
@@ -18,7 +18,7 @@ class User(Base):
     preferences = Column(JSON, default={})
     
     def verify_password(self, password: str) -> bool:
-        return bcrypt.verify(password, self.hashed_password)
+        return bcrypt.verify(password, self.password_hash)
     
     @staticmethod
     def hash_password(password: str) -> str:
