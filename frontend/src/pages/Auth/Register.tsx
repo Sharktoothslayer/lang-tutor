@@ -32,7 +32,7 @@ const Register: React.FC = () => {
     setIsLoading(true);
 
     try {
-      await register(formData.username, formData.email, formData.password);
+      await register(formData.username, formData.email, formData.password, 'en', 'it');
       toast.success('Account created successfully! Welcome to LangTutor! 🇮🇹');
       navigate('/dashboard');
     } catch (error) {
